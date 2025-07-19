@@ -6,8 +6,7 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true
   },
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/scienceforaction/' : '',
-  basePath: process.env.NODE_ENV === 'production' ? '/scienceforaction' : '',
+  // No assetPrefix or basePath needed for user.github.io deployment
   eslint: {
     ignoreDuringBuilds: true,
   },
