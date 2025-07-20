@@ -6,7 +6,18 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true
   },
-  // No assetPrefix or basePath needed for user.github.io deployment
+  // Generate static HTML for better SEO
+  generateEtags: false,
+  poweredByHeader: false,
+  
+  // Optimize for static export
+  distDir: 'out',
+  
+  // SEO optimizations
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  
   eslint: {
     ignoreDuringBuilds: true,
   },

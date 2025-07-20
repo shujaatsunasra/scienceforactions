@@ -1,10 +1,20 @@
 User-agent: *
 Allow: /
+
+# Block admin areas
 Disallow: /admin/
 Disallow: /api/
+Disallow: /_next/
+Disallow: /out/
 
-# Sitemap
+# Allow important pages
+Allow: /main
+Allow: /explore
+Allow: /tool
+Allow: /profile
+
+# Sitemap location
 Sitemap: https://scienceforactions.me/sitemap.xml
 
-# Crawl-delay for respectful crawling
+# Crawl delay for respectful crawling
 Crawl-delay: 1
