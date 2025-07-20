@@ -284,9 +284,14 @@ class SupabaseUserService {
 
   async getPersonalizedActions(userId: string, limit: number = 10): Promise<ActionItem[]> {
     try {
+      // Handle anonymous users or fallback scenarios
+      if (!userId || userId === 'default-user') {
+        return this.getPopularActions(limit);
+      }
+
       // Get user's interests and preferred causes
       const user = await this.getUserById(userId);
-      if (!user) return [];
+      if (!user) return this.getPopularActions(limit);
 
       const { interests, preferred_causes } = user;
       const allTags = [...interests, ...preferred_causes];
@@ -303,6 +308,24 @@ class SupabaseUserService {
       return data || [];
     } catch (error) {
       console.error('Error fetching personalized actions:', error);
+      return this.getPopularActions(limit); // Fallback to popular actions
+    }
+  }
+
+  async getActionsByTags(tags: string[], limit: number = 10): Promise<ActionItem[]> {
+    try {
+      const { data, error } = await supabase
+        .from('action_items')
+        .select('*')
+        .overlaps('tags', tags)
+        .eq('is_active', true)
+        .order('completion_count', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error fetching actions by tags:', error);
       return [];
     }
   }
