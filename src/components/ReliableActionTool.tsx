@@ -20,8 +20,20 @@ export default function ReliableActionTool({
   const [selectedAction, setSelectedAction] = useState('');
   const [generatedText, setGeneratedText] = useState('');
   const [isGenerating, startTransition] = useTransition();
+  const [isMobileView, setIsMobileView] = useState(false);
   
   const { profile } = useProfile();
+
+  // Check mobile view on component mount and resize
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobileView(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Predefined action types with immediate templates
   const actionTypes = [

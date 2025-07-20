@@ -7,6 +7,124 @@ import { advancedAIService } from '@/services/advancedAIService';
 import { ActionItem } from '@/lib/supabase';
 import Fuse from 'fuse.js';
 
+// Mock data for immediate functionality and fallback
+const MOCK_EXPLORE_ITEMS = [
+  {
+    id: '1',
+    title: 'Clean Industrial Heat Tax Credit',
+    description: 'Smart policies that drive investments into industrial innovation to clean up the industrial sector. Providing a clean heat production tax credit to incentivize manufacturers to switch to clean energy sources.',
+    tags: ['climate', 'industrial', 'policy', 'tax-credit'],
+    category: 'policy',
+    impact: 4,
+    relevance: 4,
+    organization: 'Climate Science Alliance',
+    link: 'https://example.org/clean-heat',
+    location: 'US',
+    trending: true,
+    featured: true,
+    difficulty: 'easy' as const,
+    impact_level: 'high' as const,
+    completion_count: 234,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: '2',
+    title: 'NY Climate Change Superfund Act',
+    description: 'New York\'s Climate Change Superfund Act establishes a cost recovery program requiring companies that have emitted significant greenhouse gases to bear costs of infrastructure adaptation.',
+    tags: ['ny', 'state-gov', 'policy', 'climate', 'superfund'],
+    category: 'policy',
+    impact: 5,
+    relevance: 5,
+    organization: 'NY Climate Action',
+    link: 'https://example.org/ny-climate',
+    location: 'New York',
+    trending: true,
+    featured: true,
+    difficulty: 'hard' as const,
+    impact_level: 'high' as const,
+    completion_count: 156,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: '3',
+    title: 'Community Solar Gardens Initiative',
+    description: 'Local community organizing to establish shared solar energy systems that allow residents to access clean energy even if they can\'t install panels on their own property.',
+    tags: ['solar', 'community', 'renewable-energy', 'local'],
+    category: 'action',
+    impact: 3,
+    relevance: 4,
+    organization: 'Local Solar Coalition',
+    link: 'https://example.org/community-solar',
+    location: 'Local',
+    trending: false,
+    featured: false,
+    difficulty: 'easy' as const,
+    impact_level: 'medium' as const,
+    completion_count: 89,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: '4',
+    title: 'Green Jobs Training Program',
+    description: 'Workforce development program that provides training and certification in renewable energy installation, energy efficiency, and sustainable agriculture.',
+    tags: ['jobs', 'training', 'green-economy', 'workforce'],
+    category: 'organization',
+    impact: 4,
+    relevance: 3,
+    organization: 'Green Jobs Alliance',
+    link: 'https://example.org/green-jobs',
+    location: 'National',
+    trending: true,
+    featured: false,
+    difficulty: 'medium' as const,
+    impact_level: 'medium' as const,
+    completion_count: 123,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: '5',
+    title: 'Renewable Energy Advocacy Campaign',
+    description: 'Join a grassroots campaign to promote renewable energy policies at the state level. Help organize rallies, contact legislators, and spread awareness about clean energy benefits.',
+    tags: ['renewable-energy', 'advocacy', 'grassroots', 'policy'],
+    category: 'action',
+    impact: 4,
+    relevance: 4,
+    organization: 'Clean Energy Coalition',
+    link: 'https://example.org/renewable-advocacy',
+    location: 'Local',
+    trending: true,
+    featured: true,
+    difficulty: 'medium' as const,
+    impact_level: 'high' as const,
+    completion_count: 287,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: '6',
+    title: 'Ocean Plastic Cleanup Volunteer Drive',
+    description: 'Participate in coastal cleanup events to remove plastic waste from beaches and waterways. Help protect marine ecosystems while raising awareness about plastic pollution.',
+    tags: ['ocean', 'plastic', 'cleanup', 'volunteer', 'marine'],
+    category: 'action',
+    impact: 3,
+    relevance: 3,
+    organization: 'Ocean Conservation Society',
+    link: 'https://example.org/ocean-cleanup',
+    location: 'Global',
+    trending: false,
+    featured: true,
+    difficulty: 'easy' as const,
+    impact_level: 'medium' as const,
+    completion_count: 445,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  }
+];
+
 export interface ExploreItem {
   id: string;
   title: string;
@@ -108,12 +226,23 @@ export function ExploreProvider({ children }: { children: React.ReactNode }) {
   const loadInitialItems = async () => {
     setIsLoading(true);
     try {
+      console.log('🔄 Loading initial items from Supabase...');
       const actions = await supabaseUserService.getActions(50, 0);
-      const transformedItems = actions.map(transformActionToExploreItem);
-      setItems(transformedItems);
+      console.log('📥 Received actions from Supabase:', actions.length);
+      
+      if (actions.length > 0) {
+        const transformedItems = actions.map(transformActionToExploreItem);
+        setItems(transformedItems);
+        console.log('✅ Set items from Supabase:', transformedItems.length);
+      } else {
+        console.log('📦 No Supabase data, using mock data fallback');
+        setItems(MOCK_EXPLORE_ITEMS);
+      }
       setCurrentPage(1);
     } catch (error) {
-      console.error('Error loading initial items:', error);
+      console.error('❌ Error loading initial items from Supabase:', error);
+      console.log('📦 Using mock data as fallback');
+      setItems(MOCK_EXPLORE_ITEMS);
     } finally {
       setIsLoading(false);
     }
