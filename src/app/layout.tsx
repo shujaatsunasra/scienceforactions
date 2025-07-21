@@ -21,7 +21,70 @@ const geistMono = Geist_Mono({
   display: 'swap',
 });
 
-export const metadata: Metadata = generateSEOMetadata('home');
+// AGGRESSIVE SEO: Force static metadata generation
+export const metadata: Metadata = {
+  metadataBase: new URL('https://scienceforactions.me'),
+  title: {
+    default: 'Science for Action | Join Science-Driven Causes in Your Community',
+    template: '%s | Science for Action'
+  },
+  description: 'Science for Action is a community-powered platform to join, support, and launch science-driven causes and campaigns across the world. Take action on what matters with science-backed civic engagement.',
+  keywords: [
+    'science causes', 'civic engagement', 'community science', 'science activism', 
+    'volunteer science', 'scientific campaigns', 'public science', 'STEM community support',
+    'climate action', 'environmental science', 'citizen science', 'science for social change',
+    'public science engagement', 'volunteer science movements', 'climate action support',
+    'how to join a science cause', 'public science projects near me', 'climate volunteer platform',
+    'student science movements', 'youth science movements', 'AI for change', 'public problem solving'
+  ],
+  authors: [{ name: 'Science for Action' }],
+  creator: 'Science for Action',
+  publisher: 'Science for Action',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  openGraph: {
+    type: 'website',
+    siteName: 'Science for Action',
+    title: 'Science for Action | Join Science-Driven Causes in Your Community',
+    description: 'Science for Action is a community-powered platform to join, support, and launch science-driven causes and campaigns across the world.',
+    url: 'https://scienceforactions.me',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Science for Action - Community-powered science campaigns'
+      }
+    ],
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    site: '@scienceforaction',
+    creator: '@scienceforaction',
+    title: 'Science for Action | Join Science-Driven Causes',
+    description: 'Community-powered platform for science-driven causes and campaigns.',
+    images: ['/og-image.jpg'],
+  },
+  verification: {
+    google: 'yPPhLtRFW6EL99093WfkyJdyj1v3Ng4mlccRfMR18xo',
+    yandex: 'verification-code-here',
+    yahoo: 'verification-code-here',
+  },
+  alternates: {
+    canonical: 'https://scienceforactions.me',
+  },
+  category: 'Science and Technology',
+};
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -59,12 +122,19 @@ export default function RootLayout({
           }}
         />
         
-        {/* Additional SEO Meta Tags */}
+        {/* Google-specific optimization tags */}
+        <meta name="google-site-verification" content="yPPhLtRFW6EL99093WfkyJdyj1v3Ng4mlccRfMR18xo" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="msapplication-TileColor" content="#ffffff" />
         <meta name="theme-color" content="#ffffff" />
         
-        {/* Preconnect to external domains for performance */}
+        {/* Google-focused structured data */}
+        <meta name="google" content="notranslate" />
+        <meta httpEquiv="Content-Language" content="en" />
+        
+        {/* Preconnect to Google services for performance */}
+        <link rel="preconnect" href="https://www.google.com" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         
