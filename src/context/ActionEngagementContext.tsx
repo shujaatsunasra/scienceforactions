@@ -247,7 +247,7 @@ const ACTION_GENERATORS = {
 };
 
 export function ActionEngagementProvider({ children }: { children: React.ReactNode }) {
-  const [currentIntent, setCurrentIntent] = useState<ActionIntentData | null>(null);
+  const [currentIntent, setCurrentIntentState] = useState<ActionIntentData | null>(null);
   const [generatedActions, setGeneratedActions] = useState<GeneratedAction[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [engagementData, setEngagementData] = useLocalStorage<UserEngagementData>('user-engagement', {
@@ -266,6 +266,22 @@ export function ActionEngagementProvider({ children }: { children: React.ReactNo
     lastEngagement: new Date().toISOString(),
     streakDays: 0
   });
+
+  // Safe setCurrentIntent wrapper to prevent unnecessary updates
+  const setCurrentIntent = useCallback((intent: ActionIntentData | null) => {
+    if (!intent) {
+      setCurrentIntentState(null);
+      return;
+    }
+    
+    // Only update if the intent is actually different
+    if (!currentIntent || 
+        currentIntent.intent !== intent.intent || 
+        currentIntent.topic !== intent.topic || 
+        currentIntent.location !== intent.location) {
+      setCurrentIntentState(intent);
+    }
+  }, [currentIntent]);
 
   // Helper function to generate default actions when no specific generator exists
   const generateDefaultActions = (intent: ActionIntentData): GeneratedAction[] => {
@@ -389,77 +405,129 @@ export function ActionEngagementProvider({ children }: { children: React.ReactNo
   };
 
   const generateAdaptiveActions = useCallback(async (intent: ActionIntentData): Promise<GeneratedAction[]> => {
+    console.log('🎯 generateAdaptiveActions called with:', intent);
+    
+    // Prevent infinite loops by checking if we're already generating or intent is the same
+    if (isGenerating) {
+      console.log('⏳ Already generating, skipping...');
+      return generatedActions;
+    }
+
+    // Check if intent is the same as current intent to prevent unnecessary re-generation
+    if (currentIntent && 
+        currentIntent.intent === intent.intent && 
+        currentIntent.topic === intent.topic && 
+        currentIntent.location === intent.location &&
+        generatedActions.length > 0) {
+      console.log('🔄 Same intent detected, returning existing actions');
+      return generatedActions;
+    }
+
     setIsGenerating(true);
-    console.log('🎯 ActionEngagementContext: generateAdaptiveActions called with:', intent);
+    
+    // Only update current intent if it's actually different (handled by setCurrentIntent wrapper now)
+    setCurrentIntent(intent);
 
     try {
-      // Stage 1: Get real Supabase data with debounced fetch
-      console.log('� Fetching real actions from Supabase...');
+      // Import mock data service for immediate results
+      const { mockActionService } = await import('@/data/mockActionData');
       
-      // Get personalized actions from Supabase based on intent
-      const [personalizedActions, popularActions] = await Promise.all([
-        supabaseUserService.getPersonalizedActions('default-user', 10), // TODO: Get actual user ID
-        supabaseUserService.getPopularActions(15)
-      ]);
+      // Stage 1: Get mock actions based on user intent (immediate results)
+      console.log('📊 Loading mock action data...');
+      const mockActions = mockActionService.getActionsByIntent(
+        intent.intent, 
+        intent.topic, 
+        intent.location, 
+        12
+      );
 
-      console.log('✅ Supabase data retrieved:', {
-        personalized: personalizedActions.length,
-        popular: popularActions.length
+      console.log('✅ Mock data retrieved:', {
+        actions: mockActions.length,
+        topics: [...new Set(mockActions.map(a => a.tags).flat())].slice(0, 5),
+        ctaTypes: [...new Set(mockActions.map(a => a.ctaType))]
       });
 
-      // Stage 2: Transform Supabase actions to GeneratedActions
-      const transformSupabaseAction = (action: ActionItem, index: number): GeneratedAction => {
-        const urgencyMap = { low: 2, medium: 3, high: 4 };
-        const impactMap = { low: 2, medium: 3, high: 5 };
-        
-        return {
-          id: action.id,
-          title: action.title,
-          description: action.description,
-          tags: action.tags || [intent.topic, intent.location, intent.intent],
-          intent: intent.intent,
-          topic: intent.topic,
-          location: action.location || intent.location,
-          cta: getCTAText(determineCTAType(action.category)),
-          ctaType: determineCTAType(action.category),
-          impact: impactMap[action.impact_level] || 3,
-          urgency: urgencyMap[action.impact_level] || 3,
-          timeCommitment: action.time_commitment || getTimeCommitment(determineCTAType(action.category)),
-          organizationName: action.organization || `${intent.topic} Action Network`,
-          link: `#action-${action.id}`,
-          nextSteps: generateContextualNextSteps(action, intent),
-          generatedAt: new Date().toISOString(),
-          relevanceScore: calculateRelevanceScore(action, intent),
-          engagementScore: action.completion_count / 10 // Convert to 0-100 scale
-        };
-      };
+      // Set mock actions immediately for fast user experience
+      setGeneratedActions(mockActions);
 
-      // Stage 3: Combine and personalize based on user engagement data
-      const combinedActions = [
-        ...personalizedActions.map((action: ActionItem, index: number) => transformSupabaseAction(action, index)),
-        ...popularActions.slice(0, 10 - personalizedActions.length).map((action: ActionItem, index: number) => 
-          transformSupabaseAction(action, index + personalizedActions.length)
-        )
-      ];
+      // Stage 2: Try to enhance with real Supabase data (fallback gracefully) in background
+      let enhancedActions = [...mockActions];
+      try {
+        const [personalizedActions, popularActions] = await Promise.all([
+          supabaseUserService.getPersonalizedActions('default-user', 5),
+          supabaseUserService.getPopularActions(5)
+        ]);
 
-      // Stage 4: AI-powered personalization and filtering
-      console.log('🤖 Applying AI personalization...');
-      const personalizedActionsResult = await personalizeActionsWithAI(combinedActions, engagementData, intent);
-      
-      // Stage 5: Fallback generation if insufficient real data
-      if (personalizedActionsResult.length < 3) {
-        console.log('⚠️ Insufficient Supabase data, generating fallback actions...');
-        const fallbackActions = generateDefaultActions(intent);
-        personalizedActionsResult.push(...fallbackActions.slice(0, 5 - personalizedActionsResult.length));
+        if (personalizedActions.length > 0 || popularActions.length > 0) {
+          console.log('🔗 Enhancing with Supabase data:', {
+            personalized: personalizedActions.length,
+            popular: popularActions.length
+          });
+
+          // Transform and integrate real data
+          const transformSupabaseAction = (action: ActionItem): GeneratedAction => {
+            const urgencyMap = { low: 2, medium: 3, high: 4 };
+            const impactMap = { low: 2, medium: 3, high: 5 };
+            
+            return {
+              id: action.id,
+              title: action.title,
+              description: action.description,
+              tags: action.tags || [intent.topic, intent.location, intent.intent],
+              intent: intent.intent,
+              topic: intent.topic,
+              location: action.location || intent.location,
+              cta: getCTAText(determineCTAType(action.category)),
+              ctaType: determineCTAType(action.category),
+              impact: impactMap[action.impact_level] || 3,
+              urgency: urgencyMap[action.impact_level] || 3,
+              timeCommitment: action.time_commitment || getTimeCommitment(determineCTAType(action.category)),
+              organizationName: action.organization || `${intent.topic} Action Network`,
+              link: `#action-${action.id}`,
+              nextSteps: generateContextualNextSteps(action, intent),
+              generatedAt: new Date().toISOString(),
+              relevanceScore: calculateRelevanceScore(action, intent),
+              engagementScore: action.completion_count / 10
+            };
+          };
+
+          const realActions = [
+            ...personalizedActions.map(transformSupabaseAction),
+            ...popularActions.map(transformSupabaseAction)
+          ];
+
+          // Mix real and mock data intelligently
+          enhancedActions = [
+            ...realActions.slice(0, 4), // Top real actions first
+            ...mockActions.slice(0, 8), // Fill with mock actions
+            ...realActions.slice(4) // Any remaining real actions
+          ].slice(0, 12);
+        }
+      } catch (supabaseError) {
+        console.log('⚠️ Supabase data unavailable, using mock data only:', supabaseError);
+        // Continue with mock data only
       }
 
-      // Stage 6: Real-time reactive updates
-      const finalActions = personalizedActionsResult.slice(0, 12); // Limit to prevent UI overload
+      // Stage 3: AI-powered personalization enhancement
+      try {
+        console.log('🤖 Applying AI personalization...');
+        const personalizedActionsResult = await personalizeActionsWithAI(enhancedActions, engagementData, intent);
+        if (personalizedActionsResult.length > 0) {
+          enhancedActions = personalizedActionsResult;
+        }
+      } catch (aiError) {
+        console.log('⚠️ AI personalization unavailable, using base actions:', aiError);
+        // Continue with existing actions
+      }
+
+      // Stage 4: Final processing and user preference learning
+      const finalActions = enhancedActions.slice(0, 12);
       console.log(`✨ Generated ${finalActions.length} adaptive actions`);
       
       setGeneratedActions(finalActions);
       
-      // Stage 7: Update engagement tracking with debounced batch updates
+      // Stage 5: Update engagement tracking safely
+      const currentEngagementData = engagementData;
       setEngagementData(prev => ({
         ...prev,
         totalActionsViewed: prev.totalActionsViewed + finalActions.length,
@@ -472,11 +540,14 @@ export function ActionEngagementProvider({ children }: { children: React.ReactNo
       return finalActions;
     } catch (error) {
       console.error('❌ Error generating adaptive actions:', error);
-      // Emergency fallback with graceful degradation
-      const emergencyActions = generateDefaultActions(intent);
+      // Emergency fallback with basic mock data
+      const { mockActionService } = await import('@/data/mockActionData');
+      const emergencyActions = mockActionService.getActionsByIntent(intent.intent, intent.topic, intent.location, 6);
       console.log('🆘 Emergency fallback actions:', emergencyActions.length);
+      
       setGeneratedActions(emergencyActions);
       
+      const currentEngagementData = engagementData;
       setEngagementData(prev => ({
         ...prev,
         totalActionsViewed: prev.totalActionsViewed + emergencyActions.length,
@@ -488,7 +559,7 @@ export function ActionEngagementProvider({ children }: { children: React.ReactNo
       setIsGenerating(false);
       console.log('🔄 Generation complete');
     }
-  }, [engagementData, setEngagementData]);
+  }, [isGenerating, generatedActions, currentIntent]); // Remove engagementData from dependencies to prevent infinite loop
 
   const completeAction = useCallback((actionId: string, feedback?: any) => {
     setGeneratedActions(prev => 
@@ -566,7 +637,7 @@ export function ActionEngagementProvider({ children }: { children: React.ReactNo
   }, [generateAdaptiveActions, engagementData]);
 
   const resetSession = useCallback(() => {
-    setCurrentIntent(null);
+    setCurrentIntentState(null);
     setGeneratedActions([]);
     setIsGenerating(false);
   }, []);
@@ -580,7 +651,7 @@ export function ActionEngagementProvider({ children }: { children: React.ReactNo
     generatedActions,
     isGenerating,
     engagementData,
-    setCurrentIntent,
+    setCurrentIntent, // Safe wrapper function to prevent unnecessary updates
     generateAdaptiveActions,
     completeAction,
     saveAction,

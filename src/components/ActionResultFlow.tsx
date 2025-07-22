@@ -83,7 +83,7 @@ const ActionResultFlow: React.FC<ActionResultFlowProps> = ({
   // Auto-generate actions when component mounts or intent changes
   useEffect(() => {
     console.log('🚀 ActionResultFlow: Effect triggered with intentData:', intentData);
-    if (intentData) {
+    if (intentData && !isGenerating) {
       console.log('📞 ActionResultFlow: Calling generateAdaptiveActions');
       generateAdaptiveActions(intentData).then(actions => {
         console.log('✅ ActionResultFlow: Actions received:', actions?.length || 0);
@@ -91,7 +91,7 @@ const ActionResultFlow: React.FC<ActionResultFlowProps> = ({
         console.error('❌ ActionResultFlow: Error generating actions:', error);
       });
     }
-  }, [intentData, generateAdaptiveActions]);
+  }, [intentData?.intent, intentData?.topic, intentData?.location, isGenerating, generateAdaptiveActions]); // Include necessary dependencies
 
   // Real-time filtering with multiple criteria
   const filteredActions = useMemo(() => {

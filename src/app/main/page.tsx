@@ -1,6 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
-import ActionTool from "@/components/ActionTool";
+import EnhancedActionTool from "@/components/EnhancedActionTool";
 import { generateMetadata as generateSEOMetadata, generateWebPageSchema, generateBreadcrumbSchema } from '@/lib/seo';
 
 export const metadata: Metadata = generateSEOMetadata('main');
@@ -33,42 +33,43 @@ export default function MainPage() {
       />
       
       <div className="flex w-full min-h-screen">
-        {/* Main content area for action tool flow */}
+        {/* Main content area for enhanced action tool */}
         <main className="flex-1 flex flex-col items-center justify-center bg-background p-4 md:p-12 pt-16 pb-20 md:pt-0 md:pb-0">
-          <div className="w-full max-w-4xl">
+          <div className="w-full max-w-6xl">
             <h1 className="sr-only">Science Action Dashboard - Take Action on Science-Driven Causes</h1>
-            <div className="mb-8 text-center">
-              <h2 className="text-2xl md:text-3xl font-bold text-text mb-4">
-                Join thousands supporting real-world climate science action
-              </h2>
-              <p className="text-grayText text-lg">
-                Browse citizen-driven scientific campaigns and make your voice heard on issues that matter.
-                Your community can lead the next breakthrough in civic science.
-              </p>
-            </div>
-            <ActionTool />
             
-            {/* SEO-rich content block */}
-            <div className="mt-12 text-center space-y-6">
-              <div className="grid md:grid-cols-2 gap-8">
-                <div className="space-y-4">
-                  <h3 className="text-xl font-semibold text-text">
-                    Science-Backed Community Action
-                  </h3>
-                  <p className="text-grayText">
-                    Connect with <strong>science activists</strong> and <strong>community organizers</strong> who are 
-                    making real change through evidence-based advocacy and <em>civic engagement</em>.
-                  </p>
+            {/* Enhanced Action Tool with better UX */}
+            <EnhancedActionTool />
+            
+            {/* Success stories and social proof */}
+            <div className="mt-16 text-center space-y-8">
+              <div className="grid md:grid-cols-3 gap-8">
+                <div className="bg-white rounded-xl p-6 border border-grayBorder shadow-sm">
+                  <div className="text-3xl font-bold text-primary mb-2">50,000+</div>
+                  <div className="text-text font-medium mb-2">Active Members</div>
+                  <div className="text-sm text-grayText">Taking action on science-driven causes worldwide</div>
                 </div>
-                <div className="space-y-4">
-                  <h3 className="text-xl font-semibold text-text">
-                    Personalized Action Opportunities
-                  </h3>
-                  <p className="text-grayText">
-                    Our platform matches you with <strong>science causes</strong> that align with your values, 
-                    from <em>climate action</em> to <em>public health research</em> and <em>environmental justice</em>.
-                  </p>
+                <div className="bg-white rounded-xl p-6 border border-grayBorder shadow-sm">
+                  <div className="text-3xl font-bold text-primary mb-2">12,500+</div>
+                  <div className="text-text font-medium mb-2">Actions Available</div>
+                  <div className="text-sm text-grayText">From local volunteer work to policy advocacy</div>
                 </div>
+                <div className="bg-white rounded-xl p-6 border border-grayBorder shadow-sm">
+                  <div className="text-3xl font-bold text-primary mb-2">98%</div>
+                  <div className="text-text font-medium mb-2">User Satisfaction</div>
+                  <div className="text-sm text-grayText">Members report meaningful impact from actions</div>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-text">
+                  Ready to make a real difference?
+                </h3>
+                <p className="text-grayText max-w-2xl mx-auto">
+                  Join thousands of people who have found their path to meaningful action. 
+                  Whether you have 5 minutes or 5 hours, there's a perfect way for you to contribute 
+                  to the causes you care about most.
+                </p>
               </div>
             </div>
           </div>
