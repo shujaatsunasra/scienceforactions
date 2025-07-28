@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { supabaseUserService } from '@/services/supabaseUserService';
 import { advancedAIService } from '@/services/advancedAIService';
 import { databaseInitializer } from '@/services/databaseInitializer';
+import { databaseSeeder } from '@/services/databaseSeeder';
 
 interface DatabaseStats {
   users: number;
@@ -39,6 +40,17 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
+  const [seedingProgress, setSeedingProgress] = useState<{
+    isSeeding: boolean;
+    progress: number;
+    currentBatch: number;
+    totalBatches: number;
+  }>({
+    isSeeding: false,
+    progress: 0,
+    currentBatch: 0,
+    totalBatches: 0
+  });
 
   useEffect(() => {
     loadInitialData();
@@ -57,7 +69,6 @@ export default function AdminDashboard() {
       await refreshStats();
       await updateSystemHealth();
     } catch (error) {
-      console.error('Error loading admin data:', error);
       addLog(`Error loading data: ${error}`);
     } finally {
       setIsLoading(false);
@@ -70,7 +81,6 @@ export default function AdminDashboard() {
       setStats(newStats);
       addLog(`Stats updated: ${newStats.users} users, ${newStats.actions} actions`);
     } catch (error) {
-      console.error('Error refreshing stats:', error);
       addLog(`Error refreshing stats: ${error}`);
     }
   };
@@ -86,7 +96,7 @@ export default function AdminDashboard() {
         recent_errors: 0, // Would be calculated from error logs
       });
     } catch (error) {
-      console.error('Error updating system health:', error);
+      // System health update failed
     }
   };
 
@@ -159,6 +169,57 @@ export default function AdminDashboard() {
       await refreshStats();
     } catch (error) {
       addLog(`User generation failed: ${error}`);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // New comprehensive data seeding functions
+  const handleSeedMassiveData = async () => {
+    setIsGenerating(true);
+    try {
+      addLog('🚀 Starting massive data seeding (10,000+ actions)...');
+      addLog('This will take several minutes. Please wait...');
+      
+      await databaseSeeder.seedActions(10000, 100);
+      
+      addLog('✅ Massive data seeding complete!');
+      addLog('📊 Generated 10,000+ scientific actions with realistic data');
+      await refreshStats();
+    } catch (error) {
+      addLog(`❌ Massive data seeding failed: ${error}`);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleSeedBatchData = async (batchSize: number) => {
+    setIsGenerating(true);
+    try {
+      addLog(`🎯 Seeding ${batchSize} actions...`);
+      
+      await databaseSeeder.seedActions(batchSize, 50);
+      
+      addLog(`✅ Successfully seeded ${batchSize} actions!`);
+      await refreshStats();
+    } catch (error) {
+      addLog(`❌ Batch seeding failed: ${error}`);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleSeedTrendingData = async () => {
+    setIsGenerating(true);
+    try {
+      addLog('📈 Updating trending data...');
+      
+      await databaseSeeder.seedTrendingData();
+      
+      addLog('✅ Trending data updated!');
+      await refreshStats();
+    } catch (error) {
+      addLog(`❌ Trending data update failed: ${error}`);
     } finally {
       setIsGenerating(false);
     }
@@ -316,6 +377,80 @@ export default function AdminDashboard() {
           </div>
         </div>
 
+        {/* Advanced Data Seeding */}
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+            🌱 Advanced Data Seeding
+          </h2>
+          
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <h3 className="font-semibold text-blue-900 mb-2">📊 Mass Data Generation</h3>
+            <p className="text-blue-800 text-sm mb-4">
+              Generate thousands of realistic scientific actions with proper categorization, 
+              locations, organizations, and engagement metrics.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <button
+                onClick={handleSeedMassiveData}
+                disabled={isGenerating}
+                className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-4 py-3 rounded-lg font-medium transition-colors duration-200"
+              >
+                {isGenerating ? '⏳ Processing...' : '🚀 Seed 10,000+ Actions'}
+              </button>
+              
+              <button
+                onClick={() => handleSeedBatchData(1000)}
+                disabled={isGenerating}
+                className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white px-4 py-3 rounded-lg font-medium transition-colors duration-200"
+              >
+                {isGenerating ? '⏳' : '🎯'} Add 1,000 Actions
+              </button>
+            </div>
+          </div>
+
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <h3 className="font-semibold text-green-900 mb-2">📈 Trending & Engagement</h3>
+            <p className="text-green-800 text-sm mb-4">
+              Update completion counts and trending status to simulate realistic platform activity.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <button
+                onClick={handleSeedTrendingData}
+                disabled={isGenerating}
+                className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+              >
+                {isGenerating ? '⏳' : '📈'} Update Trending
+              </button>
+              
+              <button
+                onClick={() => handleSeedBatchData(500)}
+                disabled={isGenerating}
+                className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+              >
+                {isGenerating ? '⏳' : '⚡'} Quick 500 Actions
+              </button>
+              
+              <button
+                onClick={() => handleSeedBatchData(100)}
+                disabled={isGenerating}
+                className="bg-green-400 hover:bg-green-500 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+              >
+                {isGenerating ? '⏳' : '🔧'} Test 100 Actions
+              </button>
+            </div>
+          </div>
+
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <h3 className="font-semibold text-yellow-900 mb-2">⚠️ Production Notes</h3>
+            <ul className="text-yellow-800 text-sm space-y-1">
+              <li>• Large data operations (10,000+ records) may take 5-10 minutes</li>
+              <li>• Database performance may be temporarily affected during seeding</li>
+              <li>• Generated data includes realistic scientific categories and organizations</li>
+              <li>• Use "Refresh Stats" to see updated counts after seeding completes</li>
+            </ul>
+          </div>
+        </div>
+
         {/* Activity Logs */}
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
@@ -348,3 +483,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+

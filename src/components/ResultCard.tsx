@@ -455,3 +455,4 @@ const ResultCard: React.FC<ResultCardProps> = ({
 };
 
 export default ResultCard;
+

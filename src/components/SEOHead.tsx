@@ -94,3 +94,4 @@ export function useSEO(data: SEOHeadProps) {
     schema: data.schema || []
   };
 }
+

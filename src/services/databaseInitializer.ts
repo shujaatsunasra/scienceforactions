@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 
 export class DatabaseInitializer {
   async initializeDatabase() {
-    console.log('🚀 Initializing Supabase database...');
+    // Production: debug output removed
     
     try {
       // Check connection
@@ -15,9 +15,9 @@ export class DatabaseInitializer {
       // Generate synthetic data
       await this.generateInitialData();
       
-      console.log('✅ Database initialization complete!');
+      // Production: debug output removed
     } catch (error) {
-      console.error('❌ Database initialization failed:', error);
+      // Production: debug output removed
       throw error;
     }
   }
@@ -27,13 +27,13 @@ export class DatabaseInitializer {
       const { data, error } = await supabase.from('user_profiles').select('id').limit(1);
       return !error;
     } catch (error) {
-      console.error('Connection check failed:', error);
+      // Production: debug output removed
       return false;
     }
   }
 
   private async generateInitialData() {
-    console.log('📊 Checking existing data...');
+    // Production: debug output removed
     
     // Check if we already have data
     const { count: userCount } = await supabase
@@ -44,22 +44,22 @@ export class DatabaseInitializer {
       .from('action_items')
       .select('id', { count: 'exact', head: true });
 
-    console.log(`Found ${userCount || 0} users and ${actionCount || 0} actions`);
+    // Production: debug output removed
 
     // Generate initial actions if none exist
     if (!actionCount || actionCount === 0) {
-      console.log('🎯 Generating action items...');
+      // Production: debug output removed
       await this.generateActionItems();
     }
 
     // Generate users if we have less than 100
     if (!userCount || userCount < 100) {
-      console.log('👥 Generating synthetic users...');
+      // Production: debug output removed
       const usersToGenerate = Math.max(500 - (userCount || 0), 0); // Much smaller default
       await supabaseUserService.generateSyntheticUsers(usersToGenerate);
     }
 
-    console.log('📈 Database seeded with initial data');
+    // Production: debug output removed
   }
 
   private async generateActionItems() {
@@ -346,31 +346,31 @@ export class DatabaseInitializer {
           .insert([actionData]);
 
         if (error) {
-          console.error('Error inserting action item:', error);
+          // Production: debug output removed
         }
       }
     }
 
-    console.log(`✅ Generated ${actionTemplates.length * 3} action items`);
+    // Production: debug output removed
   }
 
   async generateTestData() {
-    console.log('🧪 Generating test data...');
+    // Production: debug output removed
     
     try {
       // Generate a smaller set for testing
       await supabaseUserService.generateSyntheticUsers(100);
       await this.generateActionItems();
       
-      console.log('✅ Test data generated successfully');
+      // Production: debug output removed
     } catch (error) {
-      console.error('❌ Error generating test data:', error);
+      // Production: debug output removed
       throw error;
     }
   }
 
   async clearDatabase() {
-    console.log('🗑️ Clearing database...');
+    // Production: debug output removed
     
     try {
       // Clear in reverse dependency order
@@ -380,9 +380,9 @@ export class DatabaseInitializer {
       await supabase.from('action_items').delete().neq('id', '00000000-0000-0000-0000-000000000000');
       await supabase.from('user_profiles').delete().neq('id', '00000000-0000-0000-0000-000000000000');
       
-      console.log('✅ Database cleared');
+      // Production: debug output removed
     } catch (error) {
-      console.error('❌ Error clearing database:', error);
+      // Production: debug output removed
       throw error;
     }
   }
@@ -403,7 +403,7 @@ export class DatabaseInitializer {
         system_metrics: systemMetricCount.count || 0,
       };
     } catch (error) {
-      console.error('Error getting stats:', error);
+      // Production: debug output removed
       return {
         users: 0,
         actions: 0,
@@ -415,3 +415,4 @@ export class DatabaseInitializer {
 }
 
 export const databaseInitializer = new DatabaseInitializer();
+

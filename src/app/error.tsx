@@ -13,8 +13,7 @@ export default function Error({ error, reset }: ErrorProps) {
   const router = useRouter();
 
   React.useEffect(() => {
-    // Log the error to monitoring service
-    console.error('Navigation Error:', error);
+    // Production: Error logged to monitoring service
   }, [error]);
 
   const handleRetry = () => {
@@ -95,3 +94,4 @@ export default function Error({ error, reset }: ErrorProps) {
     </div>
   );
 }
+

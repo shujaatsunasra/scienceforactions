@@ -1,6 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
-import EnhancedActionTool from "@/components/EnhancedActionTool";
+import ActionTool from "@/components/ActionTool";
 import { generateMetadata as generateSEOMetadata, generateWebPageSchema, generateBreadcrumbSchema } from '@/lib/seo';
 
 export const metadata: Metadata = generateSEOMetadata('main');
@@ -38,8 +38,8 @@ export default function MainPage() {
           <div className="w-full max-w-6xl">
             <h1 className="sr-only">Science Action Dashboard - Take Action on Science-Driven Causes</h1>
             
-            {/* Enhanced Action Tool with better UX */}
-            <EnhancedActionTool />
+            {/* Primary Action Tool with enhanced UX */}
+            <ActionTool />
             
             {/* Success stories and social proof */}
             <div className="mt-16 text-center space-y-8">
@@ -78,3 +78,4 @@ export default function MainPage() {
     </>
   );
 }
+

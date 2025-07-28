@@ -1,7 +1,7 @@
 import React from "react";
 import type { Metadata } from "next";
 import ReliableActionTool from "@/components/ReliableActionTool";
-import { ProfileProvider } from "@/context/SafeProfileContext";
+import { ProfileProvider } from "@/context/ProfileContext";
 import { generateMetadata as generateSEOMetadata, generateWebPageSchema, generateBreadcrumbSchema } from '@/lib/seo';
 
 export const metadata: Metadata = generateSEOMetadata('tool');
@@ -57,3 +57,4 @@ export default function ToolPage() {
     </ProfileProvider>
   );
 }
+

@@ -226,22 +226,22 @@ export function ExploreProvider({ children }: { children: React.ReactNode }) {
   const loadInitialItems = async () => {
     setIsLoading(true);
     try {
-      console.log('🔄 Loading initial items from Supabase...');
+      // Production: debug output removed
       const actions = await supabaseUserService.getActions(50, 0);
-      console.log('📥 Received actions from Supabase:', actions.length);
+      // Production: debug output removed
       
       if (actions.length > 0) {
         const transformedItems = actions.map(transformActionToExploreItem);
         setItems(transformedItems);
-        console.log('✅ Set items from Supabase:', transformedItems.length);
+        // Production: debug output removed
       } else {
-        console.log('📦 No Supabase data, using mock data fallback');
+        // Production: debug output removed
         setItems(MOCK_EXPLORE_ITEMS);
       }
       setCurrentPage(1);
     } catch (error) {
-      console.error('❌ Error loading initial items from Supabase:', error);
-      console.log('📦 Using mock data as fallback');
+      // Production: debug output removed
+      // Production: debug output removed
       setItems(MOCK_EXPLORE_ITEMS);
     } finally {
       setIsLoading(false);
@@ -252,16 +252,28 @@ export function ExploreProvider({ children }: { children: React.ReactNode }) {
     if (!profile) return;
 
     try {
+      // Production: debug output removed
       const personalizedActions = await supabaseUserService.getPersonalizedActions(profile.id, 20);
+      
+      if (personalizedActions.length === 0) {
+        // Production: debug output removed
+        return;
+      }
+
       const enhancedItems = await Promise.all(
         personalizedActions.map(async (action) => {
-          const adaptiveCard = advancedAIService.generateAdaptiveActionCard(action, profile);
-          const transformedItem = transformActionToExploreItem(action);
-          return {
-            ...transformedItem,
-            relevance: Math.round(adaptiveCard.relevanceScore * 5),
-            impact: adaptiveCard.priority / 20,
-          };
+          try {
+            const adaptiveCard = advancedAIService.generateAdaptiveActionCard(action, profile);
+            const transformedItem = transformActionToExploreItem(action);
+            return {
+              ...transformedItem,
+              relevance: Math.round(adaptiveCard.relevanceScore * 5),
+              impact: Math.min(5, Math.max(1, adaptiveCard.priority / 20)),
+            };
+          } catch (cardError) {
+            // Production: debug output removed
+            return transformActionToExploreItem(action);
+          }
         })
       );
 
@@ -269,10 +281,25 @@ export function ExploreProvider({ children }: { children: React.ReactNode }) {
       setItems(prev => {
         const existingIds = new Set(prev.map(item => item.id));
         const newItems = enhancedItems.filter(item => !existingIds.has(item.id));
-        return [...enhancedItems, ...prev.filter(item => !enhancedItems.some(e => e.id === item.id))];
+        const mergedItems = [...enhancedItems, ...prev.filter(item => !enhancedItems.some(e => e.id === item.id))];
+        // Production: debug output removed
+        return mergedItems;
       });
     } catch (error) {
-      console.error('Error loading personalized items:', error);
+      // Production: debug output removed
+      // Don't fail silently - add fallback data
+      try {
+        const popularActions = await supabaseUserService.getPopularActions(10);
+        const transformedPopular = popularActions.map(transformActionToExploreItem);
+        setItems(prev => {
+          const existingIds = new Set(prev.map(item => item.id));
+          const newItems = transformedPopular.filter(item => !existingIds.has(item.id));
+          return [...prev, ...newItems];
+        });
+        // Production: debug output removed
+      } catch (fallbackError) {
+        // Production: debug output removed
+      }
     }
   };
 
@@ -303,65 +330,98 @@ export function ExploreProvider({ children }: { children: React.ReactNode }) {
   // Filter items based on search query and filters
   const filteredItems = useMemo(() => {
     let result = items;
+    // Production: debug output removed
 
     // Apply search query
     if (searchQuery.trim()) {
       const searchResults = fuse.search(searchQuery);
       result = searchResults.map(result => result.item);
+      // Production: debug output removed
     }
 
-    // Apply filters
+    // Apply filters with fallback logic
     if (filters.categories.length > 0) {
+      const beforeFilter = result.length;
       result = result.filter(item => filters.categories.includes(item.category));
+      // Production: debug output removed
     }
 
     if (filters.tags.length > 0) {
+      const beforeFilter = result.length;
       result = result.filter(item => 
         filters.tags.some(tag => item.tags.includes(tag))
       );
+      // Production: debug output removed
     }
 
     if (filters.difficulties.length > 0) {
+      const beforeFilter = result.length;
       result = result.filter(item => filters.difficulties.includes(item.difficulty));
+      // Production: debug output removed
     }
 
     if (filters.locations.length > 0) {
+      const beforeFilter = result.length;
       result = result.filter(item => 
         item.location && filters.locations.some(loc => 
           item.location?.toLowerCase().includes(loc.toLowerCase())
         )
       );
+      // Production: debug output removed
     }
 
     if (filters.impactRange[0] !== 1 || filters.impactRange[1] !== 5) {
+      const beforeFilter = result.length;
       result = result.filter(item => 
         item.impact >= filters.impactRange[0] && item.impact <= filters.impactRange[1]
       );
+      // Production: debug output removed
     }
 
     if (filters.timeCommitments.length > 0) {
+      const beforeFilter = result.length;
       result = result.filter(item =>
         item.time_commitment && filters.timeCommitments.includes(item.time_commitment)
       );
+      // Production: debug output removed
     }
 
     if (filters.onlyTrending) {
+      const beforeFilter = result.length;
       result = result.filter(item => item.trending);
+      // Production: debug output removed
     }
 
     if (filters.onlyFeatured) {
+      const beforeFilter = result.length;
       result = result.filter(item => item.featured);
+      // Production: debug output removed
     }
 
-    // Sort by relevance and impact
-    return result.sort((a, b) => {
+    // Enhanced sorting with user preference awareness
+    result.sort((a, b) => {
       if (profile) {
-        // Personalized sorting
-        return (b.relevance * 0.6 + b.impact * 0.4) - (a.relevance * 0.6 + a.impact * 0.4);
+        // Personalized sorting with multiple factors
+        const scoreA = (a.relevance * 0.4) + (a.impact * 0.3) + (a.completion_count / 1000 * 0.3);
+        const scoreB = (b.relevance * 0.4) + (b.impact * 0.3) + (b.completion_count / 1000 * 0.3);
+        return scoreB - scoreA;
       }
-      // Default sorting
-      return b.completion_count - a.completion_count;
+      // Default sorting for non-authenticated users
+      const scoreA = (a.impact * 0.5) + (a.completion_count / 1000 * 0.5);
+      const scoreB = (b.impact * 0.5) + (b.completion_count / 1000 * 0.5);
+      return scoreB - scoreA;
     });
+
+    // Production: debug output removed
+    
+    // If no results and filters are applied, suggest broadening search
+    if (result.length === 0 && (searchQuery || Object.values(filters).some(f => 
+      Array.isArray(f) ? f.length > 0 : f !== false && f[0] !== 1 && f[1] !== 5
+    ))) {
+      // Production: debug output removed
+    }
+
+    return result;
   }, [items, searchQuery, filters, fuse, profile]);
 
   // Get trending items
@@ -422,7 +482,7 @@ export function ExploreProvider({ children }: { children: React.ReactNode }) {
         await loadPersonalizedItems();
       }
     } catch (error) {
-      console.error('Error refreshing items:', error);
+      // Production: debug output removed
     } finally {
       setIsLoading(false);
     }
@@ -442,7 +502,7 @@ export function ExploreProvider({ children }: { children: React.ReactNode }) {
 
       return recommendedItems;
     } catch (error) {
-      console.error('Error getting recommendations:', error);
+      // Production: debug output removed
       return [];
     }
   }, [profile, items]);
@@ -465,7 +525,7 @@ export function ExploreProvider({ children }: { children: React.ReactNode }) {
         await supabaseUserService.startAction(profile.id, itemId);
       }
     } catch (error) {
-      console.error('Error tracking interaction:', error);
+      // Production: debug output removed
     }
   }, [profile]);
 
@@ -507,7 +567,7 @@ export function ExploreProvider({ children }: { children: React.ReactNode }) {
       setItems(prev => [...prev, ...newItems]);
       setCurrentPage(prev => prev + 1);
     } catch (error) {
-      console.error('Error loading more items:', error);
+      // Production: debug output removed
     } finally {
       setIsLoading(false);
     }
@@ -548,3 +608,4 @@ export function useExplore() {
 }
 
 export default ExploreContext;
+

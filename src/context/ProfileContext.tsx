@@ -81,7 +81,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
           await createDefaultProfile();
         }
       } catch (error) {
-        console.error('Error initializing profile:', error);
+        // Production: debug output removed
         await createDefaultProfile();
       } finally {
         setIsLoading(false);
@@ -96,21 +96,17 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     if (Object.keys(debouncedUpdates).length > 0 && currentUserId) {
       const syncUpdates = async () => {
         try {
-          console.log('Syncing profile updates:', Object.keys(debouncedUpdates));
+          // Production: debug output removed
           const updatedUser = await supabaseUserService.updateUser(currentUserId, debouncedUpdates);
           if (updatedUser) {
             setProfile(transformToExtendedProfile(updatedUser));
-            console.log('Profile synced successfully');
+            // Production: debug output removed
           } else {
-            console.warn('Profile update returned null, keeping local changes');
+            // Production: debug output removed
           }
           setPendingUpdates({});
         } catch (error) {
-          console.error('Error syncing profile updates:', {
-            error,
-            updates: Object.keys(debouncedUpdates),
-            userId: currentUserId
-          });
+          // Production: debug output removed
           // Don't clear pending updates on error, let them retry
         }
       };
@@ -158,7 +154,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
         }
       }
     } catch (error) {
-      console.error('Error creating default profile:', error);
+      // Production: debug output removed
     }
   };
 
@@ -198,7 +194,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
         setProfile(transformToExtendedProfile(freshProfile));
       }
     } catch (error) {
-      console.error('Error refreshing profile:', error);
+      // Production: debug output removed
     } finally {
       setIsLoading(false);
     }
@@ -218,7 +214,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
         }
       }
     } catch (error) {
-      console.error('Error creating new profile:', error);
+      // Production: debug output removed
     } finally {
       setIsLoading(false);
     }
@@ -293,7 +289,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       // Create new profile
       await createDefaultProfile();
     } catch (error) {
-      console.error('Error resetting profile:', error);
+      // Production: debug output removed
     }
   }, []);
 
@@ -308,7 +304,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       
       // Validate required fields
       if (!importedProfile.name) {
-        console.error('Invalid profile data: missing name');
+        // Production: debug output removed
         return false;
       }
 
@@ -336,7 +332,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       updateProfile(validatedProfile);
       return true;
     } catch (error) {
-      console.error('Error importing profile data:', error);
+      // Production: debug output removed
       return false;
     }
   }, [updateProfile]);
@@ -375,3 +371,4 @@ export function useProfile() {
 }
 
 export default ProfileContext;
+

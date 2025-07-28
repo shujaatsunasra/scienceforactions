@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition } from 'react';
 import { motion } from 'framer-motion';
-import { useProfile } from '@/context/SafeProfileContext';
+import { useProfile } from '@/context/ProfileContext';
 
 interface ActionToolProps {
   title?: string;
@@ -231,7 +231,7 @@ Thank you for all that you do.`
               
               <button
                 onClick={() => {
-                  console.log('Action taken:', selectedAction);
+                  // Production: debug output removed
                   alert('Great job taking action! Your voice matters.');
                 }}
                 className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors"
@@ -245,3 +245,4 @@ Thank you for all that you do.`
     </div>
   );
 }
+

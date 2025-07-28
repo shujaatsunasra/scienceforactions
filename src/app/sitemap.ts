@@ -187,7 +187,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }
   })
 
-  console.log(`Generated ${corePages.length + topicPages.length + locationPages.length + searchPages.length + problemPages.length + causePages.length} URLs for Google indexing`)
+  // Production: Generated ${corePages.length + topicPages.length + locationPages.length + searchPages.length + problemPages.length + causePages.length} URLs for Google indexing
 
   return [
     ...corePages,
@@ -198,3 +198,4 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...causePages
   ]
 }
+

@@ -282,3 +282,4 @@ const AdaptiveActionCard: React.FC<AdaptiveActionCardProps> = ({
 };
 
 export default AdaptiveActionCard;
+

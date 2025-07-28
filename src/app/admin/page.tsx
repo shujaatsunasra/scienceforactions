@@ -1,7 +1,7 @@
 import React from "react";
 import type { Metadata } from "next";
 import AdminDashboard from "@/components/AdminDashboard";
-import { ProfileProvider } from "@/context/SafeProfileContext";
+import { ProfileProvider } from "@/context/ProfileContext";
 import { generateMetadata as generateSEOMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = generateSEOMetadata('admin');
@@ -25,3 +25,4 @@ export default function AdminPage() {
     </ProfileProvider>
   );
 }
+

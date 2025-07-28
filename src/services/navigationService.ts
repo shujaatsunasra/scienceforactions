@@ -70,7 +70,7 @@ export class NavigationService {
 
       return isKnownRoute;
     } catch (error) {
-      console.warn('Route validation failed:', error);
+      // Production: debug output removed
       return false;
     }
   }
@@ -83,7 +83,7 @@ export class NavigationService {
       if (!str || typeof str !== 'string') return '';
       return encodeURIComponent(str.trim());
     } catch (error) {
-      console.warn('URI encoding failed:', str, error);
+      // Production: debug output removed
       return str.replace(/[^a-zA-Z0-9-_.~]/g, ''); // Fallback: remove special chars
     }
   }
@@ -96,7 +96,7 @@ export class NavigationService {
       const { intent, topic, location } = params;
 
       if (!intent || !topic) {
-        console.warn('Missing required route parameters:', params);
+        // Production: debug output removed
         return null;
       }
 
@@ -104,7 +104,7 @@ export class NavigationService {
       const encodedTopic = this.safeEncodeURIComponent(topic);
 
       if (!encodedIntent || !encodedTopic) {
-        console.warn('Failed to encode route parameters:', params);
+        // Production: debug output removed
         return null;
       }
 
@@ -119,7 +119,7 @@ export class NavigationService {
 
       return route;
     } catch (error) {
-      console.error('Route building failed:', params, error);
+      // Production: debug output removed
       return null;
     }
   }
@@ -139,7 +139,7 @@ export class NavigationService {
         // Validate route before navigation
         const isValid = await this.validateRoute(path);
         if (!isValid) {
-          console.warn(`Invalid route detected: ${path}, using fallback`);
+          // Production: debug output removed
           path = this.config.fallbackRoute!;
         }
 
@@ -152,7 +152,7 @@ export class NavigationService {
 
         return true;
       } catch (error) {
-        console.warn(`Navigation attempt ${attempt + 1} failed:`, error);
+        // Production: debug output removed
         
         if (attempt < this.config.retryAttempts!) {
           await this.delay(this.retryDelays[attempt] || 500);
@@ -161,11 +161,11 @@ export class NavigationService {
 
         // Final fallback
         try {
-          console.error('All navigation attempts failed, using emergency fallback');
+          // Production: debug output removed
           router.replace(this.config.fallbackRoute!);
           return false;
         } catch (fallbackError) {
-          console.error('Emergency fallback navigation failed:', fallbackError);
+          // Production: debug output removed
           return false;
         }
       }
@@ -185,7 +185,7 @@ export class NavigationService {
     try {
       const isValid = await this.validateRoute(path);
       if (!isValid) {
-        console.warn(`Skipping prefetch for invalid route: ${path}`);
+        // Production: debug output removed
         return;
       }
 
@@ -198,7 +198,7 @@ export class NavigationService {
       }
     } catch (error) {
       // Silently handle prefetch errors to avoid disrupting user experience
-      console.warn('Prefetch failed (non-critical):', path, error);
+      // Production: debug output removed
     }
   }
 
@@ -213,7 +213,7 @@ export class NavigationService {
     try {
       const route = this.buildActionRoute(params);
       if (!route) {
-        console.error('Failed to build action route, using fallback');
+        // Production: debug output removed
         return this.navigateWithRetry(router, '/tool');
       }
 
@@ -227,7 +227,7 @@ export class NavigationService {
         scroll: true 
       });
     } catch (error) {
-      console.error('Action navigation failed:', params, error);
+      // Production: debug output removed
       return this.navigateWithRetry(router, '/tool');
     }
   }
@@ -259,7 +259,7 @@ export class NavigationService {
         scroll: true
       });
     } catch (error) {
-      console.error('Navigation failed:', path, error);
+      // Production: debug output removed
       return this.navigateWithRetry(router, this.config.fallbackRoute!);
     }
   }
@@ -272,7 +272,7 @@ export class NavigationService {
       try {
         window.location.href = path;
       } catch (error) {
-        console.error('Emergency navigation failed:', error);
+        // Production: debug output removed
         // Last resort - reload to home
         window.location.reload();
       }
@@ -301,7 +301,7 @@ export class NavigationService {
         });
       }
     } catch (error) {
-      console.warn('Search params parsing failed:', error);
+      // Production: debug output removed
     }
 
     return params;
@@ -325,3 +325,4 @@ export function useNavigationService(config?: NavigationConfig) {
   }
   return navigationService;
 }
+

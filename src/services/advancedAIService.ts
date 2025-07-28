@@ -106,7 +106,7 @@ class AdvancedAIIntelligenceService {
         ui_preferences: uiPreferences,
       };
     } catch (error) {
-      console.error('Error analyzing user:', error);
+      // Production: debug output removed
       return null;
     }
   }
@@ -144,7 +144,7 @@ class AdvancedAIIntelligenceService {
         return b.confidence - a.confidence;
       });
     } catch (error) {
-      console.error('Error generating recommendations:', error);
+      // Production: debug output removed
       return [];
     }
   }
@@ -210,7 +210,7 @@ class AdvancedAIIntelligenceService {
 
       return insights;
     } catch (error) {
-      console.error('Error generating system insights:', error);
+      // Production: debug output removed
       return [];
     }
   }
@@ -322,7 +322,7 @@ class AdvancedAIIntelligenceService {
         return scoreB - scoreA;
       });
     } catch (error) {
-      console.error('Error optimizing explore feed:', error);
+      // Production: debug output removed
       return currentActions;
     }
   }
@@ -398,7 +398,7 @@ class AdvancedAIIntelligenceService {
         .sort((a, b) => b.score - a.score)
         .slice(0, 3);
     } catch (error) {
-      console.error('Error generating next best actions:', error);
+      // Production: debug output removed
       return [];
     }
   }
@@ -472,7 +472,7 @@ class AdvancedAIIntelligenceService {
         metadata: { action_id: action.id, category: action.category },
       }));
     } catch (error) {
-      console.error('Error generating action recommendations:', error);
+      // Production: debug output removed
       return [];
     }
   }
@@ -519,7 +519,7 @@ class AdvancedAIIntelligenceService {
 
       return [];
     } catch (error) {
-      console.error('Error generating community recommendations:', error);
+      // Production: debug output removed
       return [];
     }
   }
@@ -545,7 +545,7 @@ class AdvancedAIIntelligenceService {
         confidence_score: 0.85,
       };
     } catch (error) {
-      console.error('Error generating impact insight:', error);
+      // Production: debug output removed
       return null;
     }
   }
@@ -711,3 +711,4 @@ class AdvancedAIIntelligenceService {
 // Export singleton instance
 export const advancedAIService = new AdvancedAIIntelligenceService();
 export default advancedAIService;
+

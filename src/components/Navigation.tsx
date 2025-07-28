@@ -75,7 +75,7 @@ export default function Navigation() {
       }
     };
 
-    prefetchRoutes().catch(console.warn);
+    prefetchRoutes().catch(() => {}); // Graceful prefetch failure
   }, [router]);
 
   const handleNavigation = async (path: string) => {
@@ -85,10 +85,10 @@ export default function Navigation() {
       });
 
       if (!success) {
-        console.warn(`Navigation to ${path} failed, but fallback should have been triggered`);
+        // Production: debug output removed
       }
     } catch (error) {
-      console.error('Navigation error:', error);
+      // Production: debug output removed
       // Emergency fallback
       navigationService.emergencyNavigate(path);
     }
@@ -228,3 +228,4 @@ export default function Navigation() {
     </motion.div>
   );
 }
+

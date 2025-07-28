@@ -100,7 +100,7 @@ class SupabaseUserService {
 
       return data;
     } catch (error) {
-      console.error('Error creating user:', error);
+      // Production: debug output removed
       await this.recordSystemMetric('user_creation_error', 1, { 
         error: error instanceof Error ? error.message : String(error) 
       });
@@ -123,7 +123,7 @@ class SupabaseUserService {
       const enhancedUser = await this.enhanceUserWithAI(data);
       return enhancedUser;
     } catch (error) {
-      console.error('Error fetching user:', error);
+      // Production: debug output removed
       return null;
     }
   }
@@ -150,12 +150,7 @@ class SupabaseUserService {
       await this.recordSystemMetric('user_updated', 1);
       return data;
     } catch (error) {
-      console.error('Error updating user:', {
-        error,
-        userId: id,
-        updateKeys: Object.keys(updates),
-        message: error instanceof Error ? error.message : 'Unknown error'
-      });
+      // Production: debug output removed
       return null;
     }
   }
@@ -172,7 +167,7 @@ class SupabaseUserService {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching users by location:', error);
+      // Production: debug output removed
       return [];
     }
   }
@@ -189,7 +184,7 @@ class SupabaseUserService {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching users by interest:', error);
+      // Production: debug output removed
       return [];
     }
   }
@@ -206,7 +201,7 @@ class SupabaseUserService {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error searching users:', error);
+      // Production: debug output removed
       return [];
     }
   }
@@ -223,7 +218,7 @@ class SupabaseUserService {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching leaderboard:', error);
+      // Production: debug output removed
       return [];
     }
   }
@@ -243,7 +238,7 @@ class SupabaseUserService {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching recently active users:', error);
+      // Production: debug output removed
       return [];
     }
   }
@@ -262,7 +257,7 @@ class SupabaseUserService {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching actions:', error);
+      // Production: debug output removed
       return [];
     }
   }
@@ -277,7 +272,7 @@ class SupabaseUserService {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching popular actions:', error);
+      // Production: debug output removed
       return [];
     }
   }
@@ -307,7 +302,7 @@ class SupabaseUserService {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching personalized actions:', error);
+      // Production: debug output removed
       return this.getPopularActions(limit); // Fallback to popular actions
     }
   }
@@ -325,7 +320,7 @@ class SupabaseUserService {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching actions by tags:', error);
+      // Production: debug output removed
       return [];
     }
   }
@@ -351,7 +346,7 @@ class SupabaseUserService {
       await this.recordSystemMetric('action_started', 1);
       return data;
     } catch (error) {
-      console.error('Error starting action:', error);
+      // Production: debug output removed
       return null;
     }
   }
@@ -388,7 +383,7 @@ class SupabaseUserService {
 
       return data;
     } catch (error) {
-      console.error('Error completing action:', error);
+      // Production: debug output removed
       return null;
     }
   }
@@ -428,7 +423,7 @@ class SupabaseUserService {
         engagement_trends: await this.getEngagementTrends(),
       };
     } catch (error) {
-      console.error('Error fetching engagement stats:', error);
+      // Production: debug output removed
       return {
         total_users: 0,
         active_users: 0,
@@ -468,7 +463,7 @@ class SupabaseUserService {
         response_time: this.performanceMetrics.get('avg_response_time') || 0,
       };
     } catch (error) {
-      console.error('Error fetching real-time metrics:', error);
+      // Production: debug output removed
       return {
         active_sessions: 0,
         actions_in_progress: 0,
@@ -482,7 +477,7 @@ class SupabaseUserService {
   // === SYNTHETIC DATA GENERATION ===
 
   async generateSyntheticUsers(count: number = 1000): Promise<void> {
-    console.log(`Starting generation of ${count} synthetic users in Supabase...`);
+    // Production: debug output removed
     
     const batchSize = 50; // Even smaller batches for better reliability
     const startTime = Date.now();
@@ -499,11 +494,7 @@ class SupabaseUserService {
             .insert(batchUsers);
 
           if (error) {
-            console.error(`Error inserting batch ${Math.floor(i / batchSize) + 1}:`, {
-              error: error.message,
-              batchStart: i,
-              batchSize: currentBatchSize
-            });
+            // Production: debug output removed
             // Add a delay before trying the next batch
             await new Promise(resolve => setTimeout(resolve, 1000));
             continue;
@@ -512,14 +503,14 @@ class SupabaseUserService {
           successfulInserts += currentBatchSize;
 
           if ((i + batchSize) % 500 === 0) {
-            console.log(`Generated ${successfulInserts}/${count} users...`);
+            // Production: debug output removed
           }
 
           // Add a small delay between batches to prevent overwhelming the database
           await new Promise(resolve => setTimeout(resolve, 100));
           
         } catch (batchError) {
-          console.error(`Failed to process batch ${Math.floor(i / batchSize) + 1}:`, batchError);
+          // Production: debug output removed
           await new Promise(resolve => setTimeout(resolve, 2000));
         }
       }
@@ -535,9 +526,9 @@ class SupabaseUserService {
         batch_size: batchSize,
       });
 
-      console.log(`Successfully generated ${count} users and 500 actions in ${duration.toFixed(2)} seconds`);
+      // Production: debug output removed
     } catch (error) {
-      console.error('Error generating synthetic users:', error);
+      // Production: debug output removed
       throw error;
     }
   }
@@ -644,11 +635,11 @@ class SupabaseUserService {
           .insert(batchActions);
 
         if (error) {
-          console.error(`Error inserting action batch:`, error);
+          // Production: debug output removed
         }
       }
     } catch (error) {
-      console.error('Error generating synthetic actions:', error);
+      // Production: debug output removed
     }
   }
 
@@ -723,7 +714,7 @@ class SupabaseUserService {
         },
       ]);
     } catch (error) {
-      console.error('Error recording system metric:', error);
+      // Production: debug output removed
     }
   }
 
@@ -770,7 +761,7 @@ class SupabaseUserService {
 
       return distribution;
     } catch (error) {
-      console.error('Error getting location distribution:', error);
+      // Production: debug output removed
       return {};
     }
   }
@@ -832,3 +823,4 @@ class SupabaseUserService {
 // Export singleton instance
 export const supabaseUserService = new SupabaseUserService();
 export default supabaseUserService;
+

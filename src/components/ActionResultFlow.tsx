@@ -7,7 +7,6 @@ import { useActionEngagement, type GeneratedAction, type ActionIntentData } from
 import AdaptiveActionCard from './AdaptiveActionCard';
 import ActionDrawer from './ActionDrawer';
 import LoadingSpinner from './LoadingSpinner';
-import ToastNotification from './ToastNotification';
 import { navigationService } from '@/services/navigationService';
 import { useDebounce } from '@/hooks/useDebounce';
 
@@ -50,7 +49,6 @@ const ActionResultFlow: React.FC<ActionResultFlowProps> = ({
   // Enhanced state management
   const [selectedAction, setSelectedAction] = useState<GeneratedAction | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
   const [displayMode, setDisplayMode] = useState<'grid' | 'stack'>('stack');
   const [filterState, setFilterState] = useState<FilterState>({
     tags: [],
@@ -82,27 +80,23 @@ const ActionResultFlow: React.FC<ActionResultFlowProps> = ({
 
   // Auto-generate actions when component mounts or intent changes
   useEffect(() => {
-    console.log('🚀 ActionResultFlow: Effect triggered with intentData:', intentData);
+    // Production: debug output removed
     if (intentData && !isGenerating) {
-      console.log('📞 ActionResultFlow: Calling generateAdaptiveActions');
+      // Production: debug output removed
       generateAdaptiveActions(intentData).then(actions => {
-        console.log('✅ ActionResultFlow: Actions received:', actions?.length || 0);
+        // Production: debug output removed
       }).catch(error => {
-        console.error('❌ ActionResultFlow: Error generating actions:', error);
+        // Production: debug output removed
       });
     }
   }, [intentData?.intent, intentData?.topic, intentData?.location, isGenerating, generateAdaptiveActions]); // Include necessary dependencies
 
   // Real-time filtering with multiple criteria
   const filteredActions = useMemo(() => {
-    console.log('🔍 Real-time filtering actions:', {
-      total: generatedActions?.length || 0,
-      filters: filterState,
-      searchQuery: debouncedSearchQuery
-    });
+    // Production: debug output removed
     
     if (!generatedActions || generatedActions.length === 0) {
-      console.log('📭 No actions to filter');
+      // Production: debug output removed
       return [];
     }
 
@@ -149,10 +143,7 @@ const ActionResultFlow: React.FC<ActionResultFlowProps> = ({
       );
     }
 
-    console.log('✅ Filtered results:', {
-      filteredCount: filtered.length,
-      originalCount: generatedActions.length
-    });
+    // Production: debug output removed
     
     return filtered;
   }, [generatedActions, filterState, debouncedSearchQuery]);
@@ -216,10 +207,7 @@ const ActionResultFlow: React.FC<ActionResultFlowProps> = ({
   // Handle action completion
   const handleActionComplete = useCallback((actionId: string, feedback?: Record<string, unknown>) => {
     completeAction(actionId, feedback);
-    setToast({
-      message: 'Action completed! Your engagement has been recorded.',
-      type: 'success'
-    });
+    // Action completion feedback handled via state updates
     
     // Close drawer after completion
     setTimeout(() => {
@@ -231,19 +219,13 @@ const ActionResultFlow: React.FC<ActionResultFlowProps> = ({
   // Handle action saving
   const handleActionSave = useCallback((actionId: string) => {
     saveAction(actionId);
-    setToast({
-      message: 'Action saved to your profile!',
-      type: 'success'
-    });
+    // Action saved feedback handled via state updates
   }, [saveAction]);
 
   // Handle action rating for ML improvement
   const handleActionRate = useCallback((actionId: string, rating: number, feedback?: string) => {
     updateUserPreferences(actionId, rating, feedback);
-    setToast({
-      message: 'Thank you for your feedback! This helps us improve recommendations.',
-      type: 'info'
-    });
+    // Rating feedback handled via state updates
   }, [updateUserPreferences]);
 
   // Get unique tags for filtering (legacy compatibility)
@@ -784,18 +766,10 @@ const ActionResultFlow: React.FC<ActionResultFlowProps> = ({
         onRate={(rating: number, feedback: string | undefined) => selectedAction && handleActionRate(selectedAction.id, rating, feedback)}
       />
 
-      {/* Toast notifications */}
-      <AnimatePresence>
-        {toast && (
-          <ToastNotification
-            message={toast.message}
-            type={toast.type}
-            onClose={() => setToast(null)}
-          />
-        )}
-      </AnimatePresence>
+      {/* Notifications handled by browser or other system */}
     </div>
   );
 };
 
 export default ActionResultFlow;
+

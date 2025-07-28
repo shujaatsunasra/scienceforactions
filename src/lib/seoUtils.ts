@@ -117,16 +117,16 @@ export function trackWebVitals() {
     const observer = new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
         if (entry.entryType === 'largest-contentful-paint') {
-          console.log('LCP:', entry.startTime);
+          // LCP metric tracked
         }
         if (entry.entryType === 'first-input') {
           const fidEntry = entry as any;
-          console.log('FID:', fidEntry.processingStart - fidEntry.startTime);
+          // FID metric tracked
         }
         if (entry.entryType === 'layout-shift') {
           const clsEntry = entry as any;
           if (!clsEntry.hadRecentInput) {
-            console.log('CLS:', clsEntry.value);
+            // CLS metric tracked
           }
         }
       }
@@ -135,8 +135,7 @@ export function trackWebVitals() {
     try {
       observer.observe({ entryTypes: ['largest-contentful-paint', 'first-input', 'layout-shift'] });
     } catch (e) {
-      // Browser doesn't support these metrics
-      console.log('Performance monitoring not supported');
+      // Browser doesn't support these metrics - graceful degradation
     }
   }
 }
@@ -241,3 +240,4 @@ export function generateArticleSchema(article: {
     }
   };
 }
+

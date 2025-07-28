@@ -285,7 +285,7 @@ export function ActionEngagementProvider({ children }: { children: React.ReactNo
 
   // Helper function to generate default actions when no specific generator exists
   const generateDefaultActions = (intent: ActionIntentData): GeneratedAction[] => {
-    console.log('🔧 Generating default actions for:', intent);
+    // Production: debug output removed
     return [
       {
         id: `default-${intent.intent.replace(/\s+/g, '_')}-${Date.now()}`,
@@ -391,7 +391,7 @@ export function ActionEngagementProvider({ children }: { children: React.ReactNo
         engagementScore: calculateEngagementScore(action, userData)
       })).sort((a, b) => (b.engagementScore || 0) - (a.engagementScore || 0));
     } catch (error) {
-      console.warn('AI personalization failed, using basic personalization:', error);
+      // Production: debug output removed
       return personalizeActions(actions, userData);
     }
   };
@@ -404,12 +404,50 @@ export function ActionEngagementProvider({ children }: { children: React.ReactNo
     return updatedList;
   };
 
+  const generateTemplateActions = async (intent: ActionIntentData): Promise<GeneratedAction[]> => {
+    const templates: GeneratedAction[] = [
+      {
+        id: `action-${Date.now()}-1`,
+        title: `Contact Your Representative About ${intent.topic}`,
+        description: `Reach out to local officials about ${intent.topic} issues in ${intent.location}`,
+        tags: [intent.topic, intent.location, 'advocacy'],
+        intent: intent.intent,
+        topic: intent.topic,
+        location: intent.location,
+        cta: 'Contact Representative',
+        ctaType: 'contact_rep',
+        impact: 5,
+        urgency: 5,
+        timeCommitment: '15 minutes',
+        organizationName: 'Local Government',
+        generatedAt: new Date().toISOString()
+      },
+      {
+        id: `action-${Date.now()}-2`, 
+        title: `Join ${intent.topic} Advocacy Group`,
+        description: `Connect with local ${intent.topic} organizations in ${intent.location}`,
+        tags: [intent.topic, intent.location, 'community'],
+        intent: intent.intent,
+        topic: intent.topic,
+        location: intent.location,
+        cta: 'Join Group',
+        ctaType: 'volunteer',
+        impact: 3,
+        urgency: 3,
+        timeCommitment: '2 hours',
+        organizationName: 'Community Organization',
+        generatedAt: new Date().toISOString()
+      }
+    ];
+    return templates;
+  };
+
   const generateAdaptiveActions = useCallback(async (intent: ActionIntentData): Promise<GeneratedAction[]> => {
-    console.log('🎯 generateAdaptiveActions called with:', intent);
+    // Production: debug output removed
     
     // Prevent infinite loops by checking if we're already generating or intent is the same
     if (isGenerating) {
-      console.log('⏳ Already generating, skipping...');
+      // Production: debug output removed
       return generatedActions;
     }
 
@@ -419,7 +457,7 @@ export function ActionEngagementProvider({ children }: { children: React.ReactNo
         currentIntent.topic === intent.topic && 
         currentIntent.location === intent.location &&
         generatedActions.length > 0) {
-      console.log('🔄 Same intent detected, returning existing actions');
+      // Production: debug output removed
       return generatedActions;
     }
 
@@ -429,29 +467,14 @@ export function ActionEngagementProvider({ children }: { children: React.ReactNo
     setCurrentIntent(intent);
 
     try {
-      // Import mock data service for immediate results
-      const { mockActionService } = await import('@/data/mockActionData');
+      // Stage 1: Get base template actions (immediate results)
+      const templateActions = await generateTemplateActions(intent);
       
-      // Stage 1: Get mock actions based on user intent (immediate results)
-      console.log('📊 Loading mock action data...');
-      const mockActions = mockActionService.getActionsByIntent(
-        intent.intent, 
-        intent.topic, 
-        intent.location, 
-        12
-      );
-
-      console.log('✅ Mock data retrieved:', {
-        actions: mockActions.length,
-        topics: [...new Set(mockActions.map(a => a.tags).flat())].slice(0, 5),
-        ctaTypes: [...new Set(mockActions.map(a => a.ctaType))]
-      });
-
-      // Set mock actions immediately for fast user experience
-      setGeneratedActions(mockActions);
+      // Set template actions immediately for fast user experience
+      setGeneratedActions(templateActions);
 
       // Stage 2: Try to enhance with real Supabase data (fallback gracefully) in background
-      let enhancedActions = [...mockActions];
+      let enhancedActions = [...templateActions];
       try {
         const [personalizedActions, popularActions] = await Promise.all([
           supabaseUserService.getPersonalizedActions('default-user', 5),
@@ -459,10 +482,7 @@ export function ActionEngagementProvider({ children }: { children: React.ReactNo
         ]);
 
         if (personalizedActions.length > 0 || popularActions.length > 0) {
-          console.log('🔗 Enhancing with Supabase data:', {
-            personalized: personalizedActions.length,
-            popular: popularActions.length
-          });
+          // Production: debug output removed
 
           // Transform and integrate real data
           const transformSupabaseAction = (action: ActionItem): GeneratedAction => {
@@ -499,30 +519,30 @@ export function ActionEngagementProvider({ children }: { children: React.ReactNo
           // Mix real and mock data intelligently
           enhancedActions = [
             ...realActions.slice(0, 4), // Top real actions first
-            ...mockActions.slice(0, 8), // Fill with mock actions
+            ...templateActions.slice(0, 8), // Fill with template actions
             ...realActions.slice(4) // Any remaining real actions
           ].slice(0, 12);
         }
       } catch (supabaseError) {
-        console.log('⚠️ Supabase data unavailable, using mock data only:', supabaseError);
+        // Production: debug output removed
         // Continue with mock data only
       }
 
       // Stage 3: AI-powered personalization enhancement
       try {
-        console.log('🤖 Applying AI personalization...');
+        // Production: debug output removed
         const personalizedActionsResult = await personalizeActionsWithAI(enhancedActions, engagementData, intent);
         if (personalizedActionsResult.length > 0) {
           enhancedActions = personalizedActionsResult;
         }
       } catch (aiError) {
-        console.log('⚠️ AI personalization unavailable, using base actions:', aiError);
+        // Production: debug output removed
         // Continue with existing actions
       }
 
       // Stage 4: Final processing and user preference learning
       const finalActions = enhancedActions.slice(0, 12);
-      console.log(`✨ Generated ${finalActions.length} adaptive actions`);
+      // Production: debug output removed
       
       setGeneratedActions(finalActions);
       
@@ -539,11 +559,10 @@ export function ActionEngagementProvider({ children }: { children: React.ReactNo
 
       return finalActions;
     } catch (error) {
-      console.error('❌ Error generating adaptive actions:', error);
-      // Emergency fallback with basic mock data
-      const { mockActionService } = await import('@/data/mockActionData');
-      const emergencyActions = mockActionService.getActionsByIntent(intent.intent, intent.topic, intent.location, 6);
-      console.log('🆘 Emergency fallback actions:', emergencyActions.length);
+      // Production: debug output removed
+      // Emergency fallback with basic template data
+      const emergencyActions = await generateTemplateActions(intent);
+      // Production: debug output removed
       
       setGeneratedActions(emergencyActions);
       
@@ -557,7 +576,7 @@ export function ActionEngagementProvider({ children }: { children: React.ReactNo
       return emergencyActions;
     } finally {
       setIsGenerating(false);
-      console.log('🔄 Generation complete');
+      // Production: debug output removed
     }
   }, [isGenerating, generatedActions, currentIntent]); // Remove engagementData from dependencies to prevent infinite loop
 
@@ -731,3 +750,4 @@ function optimizeForUser(actions: GeneratedAction[], userData: UserEngagementDat
   // Advanced ML optimization would go here
   return actions;
 }
+

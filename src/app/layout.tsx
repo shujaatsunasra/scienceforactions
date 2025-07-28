@@ -6,6 +6,7 @@ import { ProfileProvider } from '@/context/ProfileContext';
 import { InteractionProvider } from '@/context/InteractionContext';
 import { ExploreProvider } from '@/context/ExploreContext';
 import MainLayout from '@/components/MainLayout';
+import AutonomousSystemStatus from '@/components/AutonomousSystemStatus';
 import { generateMetadata as generateSEOMetadata, generateWebsiteSchema, generateOrganizationSchema } from '@/lib/seo';
 
 const geistSans = Geist({
@@ -152,6 +153,7 @@ export default function RootLayout({
                 <MainLayout>
                   {children}
                 </MainLayout>
+                <AutonomousSystemStatus />
               </ExploreProvider>
             </ActionEngagementProvider>
           </ProfileProvider>
@@ -160,3 +162,4 @@ export default function RootLayout({
     </html>
   );
 }
+

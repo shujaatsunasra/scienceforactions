@@ -142,3 +142,4 @@ export const checkSupabaseConnection = async (): Promise<boolean> => {
 };
 
 export default supabase;
+
