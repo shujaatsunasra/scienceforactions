@@ -17,103 +17,44 @@ export default function AdaptiveLayout({ children, pageType = 'home' }: Adaptive
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Determine layout mode based on user behavior and engagement
-    if (behaviorData.engagementLevel === 'low' || behaviorData.frustrationSignals > 2) {
-      setLayoutMode('zen');
-    } else if (behaviorData.engagementLevel === 'high' && behaviorData.interactionCount > 50) {
-      setLayoutMode('power-user');
-    } else {
-      setLayoutMode('standard');
-    }
-
+    // Simplified layout mode for better performance
+    // Always use standard mode to avoid performance issues from mode switching
+    setLayoutMode('standard');
     setIsLoading(false);
-  }, [behaviorData]);
+  }, []);
 
-  // Generate layout classes based on UI state
+  // Generate layout classes based on UI state - simplified for performance
   const getLayoutClasses = () => {
-    const baseClasses = 'min-h-screen transition-all duration-300 ease-in-out';
-    const complexityClasses = {
-      minimal: 'max-w-4xl mx-auto px-4',
-      standard: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',
-      detailed: 'max-w-full px-2 sm:px-4 lg:px-6'
-    };
-
-    const colorSchemeClasses = {
-      warm: 'bg-gradient-to-br from-orange-50 to-red-50 text-orange-900',
-      cool: 'bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-900',
-      neutral: 'bg-gradient-to-br from-gray-50 to-slate-50 text-gray-900',
-      'high-contrast': 'bg-white text-black'
-    };
-
-    const densityClasses = {
-      sparse: 'space-y-8',
-      normal: 'space-y-6',
-      dense: 'space-y-4'
-    };
-
-    return `${baseClasses} ${complexityClasses[uiState.layoutComplexity]} ${colorSchemeClasses[uiState.colorScheme]} ${densityClasses[uiState.contentDensity]}`;
+    return 'min-h-screen transition-opacity duration-300 ease-in-out max-w-7xl mx-auto px-4 sm:px-6 lg:px-8';
   };
 
-  // Generate animation classes
+  // Generate animation classes - optimized for performance
   const getAnimationClasses = () => {
     const animationMap = {
       none: '',
       subtle: 'animate-fade-in',
-      moderate: 'animate-fade-in transition-transform hover:scale-[1.02]',
-      vibrant: 'animate-fade-in transition-all hover:scale-105 hover:shadow-lg'
+      moderate: 'animate-fade-in',
+      vibrant: 'animate-fade-in'
     };
 
     return animationMap[uiState.animationIntensity];
   };
 
-  // Generate interaction hints if needed
+  // Generate interaction hints if needed - disabled for performance
   const renderInteractionHints = () => {
-    if (!uiState.interactionHints) return null;
-
-    return (
-      <div className="fixed bottom-20 left-4 bg-blue-600 text-white p-3 rounded-lg shadow-lg z-40 animate-bounce">
-        <div className="text-sm font-medium">💡 Tip</div>
-        <div className="text-xs">Click any cause to learn more and take action!</div>
-      </div>
-    );
+    // Disabled to improve performance
+    return null;
   };
 
-  // Render predictive action suggestions
+  // Render predictive action suggestions - disabled for performance
   const renderPredictiveActions = () => {
-    if (!uiState.predictiveActions.length) return null;
-
-    return (
-      <div className="fixed bottom-4 left-4 bg-gray-800 text-white p-3 rounded-lg shadow-lg z-40 max-w-sm">
-        <div className="text-sm font-medium mb-2">🤖 Suggested Actions</div>
-        <div className="space-y-1">
-          {uiState.predictiveActions.map((action, index) => (
-            <button
-              key={index}
-              className="block w-full text-left text-xs text-gray-300 hover:text-white transition-colors"
-              onClick={() => {
-                // In a real implementation, these would trigger actual actions
-                // Production: debug output removed
-              }}
-            >
-              • {action}
-            </button>
-          ))}
-        </div>
-      </div>
-    );
+    // Disabled to improve performance and reduce visual clutter
+    return null;
   };
 
-  // Render engagement feedback
+  // Render engagement feedback - simplified for performance
   const renderEngagementFeedback = () => {
-    if (behaviorData.engagementLevel === 'high' && Math.random() > 0.95) {
-      return (
-        <div className="fixed top-20 right-4 bg-green-600 text-white p-3 rounded-lg shadow-lg z-40 animate-slide-in-right">
-          <div className="text-sm font-medium">🎉 You're making a difference!</div>
-          <div className="text-xs">Your engagement helps strengthen our community</div>
-        </div>
-      );
-    }
-
+    // Disabled to reduce visual clutter and improve performance
     return null;
   };
 
@@ -181,15 +122,12 @@ export default function AdaptiveLayout({ children, pageType = 'home' }: Adaptive
     </div>
   );
 
-  // Standard mode layout (balanced)
+  // Standard mode layout (balanced) - optimized for performance
   const renderStandardMode = () => (
     <div className={getLayoutClasses()}>
-      <main className={`pt-16 pb-8 ${getAnimationClasses()}`}>
+      <main className="pt-16 pb-8">
         {children}
       </main>
-      {renderInteractionHints()}
-      {renderPredictiveActions()}
-      {renderEngagementFeedback()}
     </div>
   );
 
@@ -220,65 +158,15 @@ export default function AdaptiveLayout({ children, pageType = 'home' }: Adaptive
       {/* Layout Mode Indicator */}
       {renderLayoutModeIndicator()}
 
-      {/* Auto-suggestions overlay */}
-      {uiState.autoSuggest && behaviorData.sessionDuration > 30000 && (
-        <div className="fixed bottom-32 right-4 bg-blue-600 text-white p-3 rounded-lg shadow-lg z-40 max-w-xs animate-fade-in">
-          <div className="text-sm font-medium mb-2">💡 Personalized for you</div>
-          <div className="text-xs">
-            Based on your activity, you might be interested in {pageType === 'explore' ? 'climate action causes' : 'taking action on causes you care about'}.
-          </div>
-          <button
-            className="text-xs text-blue-200 hover:text-white mt-2 block"
-            onClick={() => {
-              // Implement suggestion acceptance logic
-              // Production: debug output removed
-            }}
-          >
-            Show me →
-          </button>
-        </div>
-      )}
+      {/* Auto-suggestions overlay - disabled for performance */}
+      
+      {/* Contextual help - disabled for performance */}
 
-      {/* Contextual help based on user behavior */}
-      {behaviorData.frustrationSignals > 1 && (
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 text-white p-6 rounded-lg shadow-xl z-50 max-w-md">
-          <div className="text-center">
-            <div className="text-lg font-medium mb-2">Need help?</div>
-            <div className="text-sm mb-4">
-              We noticed you might be having trouble. Would you like some guidance?
-            </div>
-            <div className="space-x-3">
-              <button
-                className="bg-white text-red-600 px-4 py-2 rounded text-sm font-medium hover:bg-gray-100"
-                onClick={() => {
-                  // Trigger help system
-                  setLayoutMode('zen');
-                }}
-              >
-                Yes, simplify interface
-              </button>
-              <button
-                className="border border-white text-white px-4 py-2 rounded text-sm font-medium hover:bg-red-700"
-                onClick={() => {
-                  // Dismiss help
-                  // Production: debug output removed
-                }}
-              >
-                No, I'm fine
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Performance indicator */}
-      <div className="fixed bottom-2 right-2 text-xs text-gray-400 z-20">
+      {/* Performance indicator - simplified */}
+      <div className="fixed bottom-2 right-2 text-xs text-gray-400 z-20 opacity-50">
         <div className="flex items-center space-x-2">
-          <div className={`w-2 h-2 rounded-full ${
-            behaviorData.sessionDuration < 10000 ? 'bg-green-400' :
-            behaviorData.sessionDuration < 30000 ? 'bg-yellow-400' : 'bg-red-400'
-          }`}></div>
-          <span>Adaptive UI Active</span>
+          <div className="w-2 h-2 rounded-full bg-green-400"></div>
+          <span>Adaptive UI</span>
         </div>
       </div>
     </>
