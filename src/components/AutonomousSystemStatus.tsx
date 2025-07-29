@@ -1,6 +1,6 @@
 'use client';
 
-import { useAutonomousSystemInitializer, getStatusColor } from '../hooks/useAutonomousSystemInitializer';
+import useAutonomousSystemInitializer, { getStatusColor } from '../hooks/useAutonomousSystemInitializer';
 
 export default function AutonomousSystemStatus() {
   const { status, isInitialized, initializationError, restartSystem } = useAutonomousSystemInitializer();

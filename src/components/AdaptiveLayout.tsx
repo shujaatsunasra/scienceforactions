@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useEmotionAwareUI } from '@/services/emotionAwareUIEngine';
-import { autonomousEngine } from '@/services/autonomousEvolutionEngine';
-import EvolutionDashboard from './EvolutionDashboard';
 
 interface AdaptiveLayoutProps {
   children: React.ReactNode;
@@ -12,7 +10,6 @@ interface AdaptiveLayoutProps {
 
 export default function AdaptiveLayout({ children, pageType = 'home' }: AdaptiveLayoutProps) {
   const { uiState, behaviorData } = useEmotionAwareUI();
-  const [showEvolutionDashboard, setShowEvolutionDashboard] = useState(false);
   const [layoutMode, setLayoutMode] = useState<'standard' | 'zen' | 'power-user'>('standard');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -60,7 +57,8 @@ export default function AdaptiveLayout({ children, pageType = 'home' }: Adaptive
 
   // Render layout mode indicator (for development/admin)
   const renderLayoutModeIndicator = () => {
-    if (!showEvolutionDashboard) return null;
+    // Only show in admin mode or development
+    if (pageType !== 'admin') return null;
 
     return (
       <div className="fixed top-4 left-4 bg-gray-800 text-white p-2 rounded text-xs z-30">
@@ -148,12 +146,6 @@ export default function AdaptiveLayout({ children, pageType = 'home' }: Adaptive
       {layoutMode === 'zen' && renderZenMode()}
       {layoutMode === 'power-user' && renderPowerUserMode()}
       {layoutMode === 'standard' && renderStandardMode()}
-
-      {/* Evolution Dashboard */}
-      <EvolutionDashboard
-        isVisible={showEvolutionDashboard}
-        onToggle={() => setShowEvolutionDashboard(!showEvolutionDashboard)}
-      />
 
       {/* Layout Mode Indicator */}
       {renderLayoutModeIndicator()}

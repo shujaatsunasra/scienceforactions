@@ -189,6 +189,22 @@ class SupabaseUserService {
     }
   }
 
+  async getUsersByEmail(email: string): Promise<UserProfile[]> {
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('email', email)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      // Production: debug output removed
+      return [];
+    }
+  }
+
   async searchUsers(query: string, limit: number = 50): Promise<UserProfile[]> {
     try {
       const { data, error } = await supabase

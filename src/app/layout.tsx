@@ -1,25 +1,28 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ActionEngagementProvider } from '@/context/ActionEngagementContext';
 import { ProfileProvider } from '@/context/ProfileContext';
+import { AuthProvider } from '@/context/AuthContext';
 import { InteractionProvider } from '@/context/InteractionContext';
 import { ExploreProvider } from '@/context/ExploreContext';
 import MainLayout from '@/components/MainLayout';
-import AutonomousSystemStatus from '@/components/AutonomousSystemStatus';
+import RouteGuard from '@/components/RouteGuard';
 import { generateMetadata as generateSEOMetadata, generateWebsiteSchema, generateOrganizationSchema } from '@/lib/seo';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
   display: 'swap',
   preload: true,
+  weight: ['300', '400', '500', '600', '700'],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetBrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
   display: 'swap',
+  weight: ['400', '500', '600', '700'],
 });
 
 // AGGRESSIVE SEO: Force static metadata generation
@@ -145,19 +148,22 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans bg-background text-text`} suppressHydrationWarning>
-        <InteractionProvider>
-          <ProfileProvider>
-            <ActionEngagementProvider>
-              <ExploreProvider>
-                <MainLayout>
-                  {children}
-                </MainLayout>
-                <AutonomousSystemStatus />
-              </ExploreProvider>
-            </ActionEngagementProvider>
-          </ProfileProvider>
-        </InteractionProvider>
+      <body className={`${spaceGrotesk.variable} ${jetBrainsMono.variable} antialiased font-sans bg-background text-text`} suppressHydrationWarning>
+        <AuthProvider>
+          <RouteGuard>
+            <InteractionProvider>
+              <ProfileProvider>
+                <ActionEngagementProvider>
+                  <ExploreProvider>
+                    <MainLayout>
+                      {children}
+                    </MainLayout>
+                  </ExploreProvider>
+                </ActionEngagementProvider>
+              </ProfileProvider>
+            </InteractionProvider>
+          </RouteGuard>
+        </AuthProvider>
       </body>
     </html>
   );
