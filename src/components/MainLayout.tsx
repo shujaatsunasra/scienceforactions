@@ -57,7 +57,7 @@ export default function MainLayout({
         />
 
         {/* Main Content Area */}
-        <main className="flex-1 lg:ml-0">
+        <main className="flex-1 min-w-0">
           {isInitialized ? (
             <AdaptiveLayout>
               <div className="transition-opacity duration-300 ease-in-out">

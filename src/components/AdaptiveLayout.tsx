@@ -149,38 +149,34 @@ export default function AdaptiveLayout({ children, pageType = 'home' }: Adaptive
 
   // Power user mode layout (dense, feature-rich)
   const renderPowerUserMode = () => (
-    <div className="min-h-screen bg-gray-100">
-      <div className="flex">
-        <aside className="w-64 bg-white shadow-sm min-h-screen p-4">
-          <div className="space-y-4">
-            <div className="text-sm font-medium text-gray-900">Quick Actions</div>
-            {uiState.predictiveActions.map((action, index) => (
-              <button
-                key={index}
-                className="block w-full text-left text-sm text-gray-600 hover:text-gray-900 p-2 rounded hover:bg-gray-100 transition-colors"
-              >
-                {action}
-              </button>
-            ))}
-          </div>
-        </aside>
-        <main className="flex-1 p-6">
-          <div className="grid grid-cols-12 gap-6">
-            <div className="col-span-8">
-              {children}
-            </div>
-            <div className="col-span-4 space-y-4">
-              <div className="bg-white rounded-lg p-4 shadow-sm">
-                <h3 className="text-sm font-medium text-gray-900 mb-2">Activity Summary</h3>
-                <div className="text-xs text-gray-600 space-y-1">
-                  <div>Interactions: {behaviorData.interactionCount}</div>
-                  <div>Scroll: {Math.round(behaviorData.scrollDepth)}%</div>
-                  <div>Session: {Math.round(behaviorData.sessionDuration / 1000)}s</div>
-                </div>
-              </div>
+    <div className="min-h-screen bg-gray-100 p-6">
+      <div className="grid grid-cols-12 gap-6">
+        <div className="col-span-8">
+          {children}
+        </div>
+        <div className="col-span-4 space-y-4">
+          <div className="bg-white rounded-lg p-4 shadow-sm">
+            <h3 className="text-sm font-medium text-gray-900 mb-2">Quick Actions</h3>
+            <div className="space-y-2">
+              {uiState.predictiveActions.map((action, index) => (
+                <button
+                  key={index}
+                  className="block w-full text-left text-sm text-gray-600 hover:text-gray-900 p-2 rounded hover:bg-gray-100 transition-colors"
+                >
+                  {action}
+                </button>
+              ))}
             </div>
           </div>
-        </main>
+          <div className="bg-white rounded-lg p-4 shadow-sm">
+            <h3 className="text-sm font-medium text-gray-900 mb-2">Activity Summary</h3>
+            <div className="text-xs text-gray-600 space-y-1">
+              <div>Interactions: {behaviorData.interactionCount}</div>
+              <div>Scroll: {Math.round(behaviorData.scrollDepth)}%</div>
+              <div>Session: {Math.round(behaviorData.sessionDuration / 1000)}s</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

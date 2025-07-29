@@ -103,17 +103,19 @@ export default function Navigation() {
   };
 
   return (
-    <motion.div
-      initial={{ x: -100, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-    >
-      <nav className="w-80 h-screen bg-card border-r border-grayBorder flex flex-col">
-        {/* Brand Header */}
-        <div className="p-8 border-b border-grayBorder">
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-          >
+    <div className="w-80 h-screen flex-shrink-0">
+      <motion.div
+        initial={{ x: -100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        style={{ width: '100%', height: '100%' }}
+      >
+        <nav className="w-full h-full bg-card border-r border-grayBorder flex flex-col">
+          {/* Brand Header */}
+          <div className="p-8 border-b border-grayBorder">
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+            >
             <div 
               onClick={handleBrandClick}
               className="cursor-pointer"
@@ -224,8 +226,9 @@ export default function Navigation() {
             <p>Making science accessible and actionable</p>
           </div>
         </div>
-      </nav>
-    </motion.div>
+        </nav>
+      </motion.div>
+    </div>
   );
 }
 
