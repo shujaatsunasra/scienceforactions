@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { useEmotionAwareUI } from '@/services/emotionAwareUIEngine';
 import { autonomousEngine } from '@/services/autonomousEvolutionEngine';
 import EvolutionDashboard from './EvolutionDashboard';
-import Navigation from './Navigation';
 
 interface AdaptiveLayoutProps {
   children: React.ReactNode;
@@ -151,7 +150,6 @@ export default function AdaptiveLayout({ children, pageType = 'home' }: Adaptive
   // Power user mode layout (dense, feature-rich)
   const renderPowerUserMode = () => (
     <div className="min-h-screen bg-gray-100">
-      <Navigation />
       <div className="flex">
         <aside className="w-64 bg-white shadow-sm min-h-screen p-4">
           <div className="space-y-4">
@@ -190,7 +188,6 @@ export default function AdaptiveLayout({ children, pageType = 'home' }: Adaptive
   // Standard mode layout (balanced)
   const renderStandardMode = () => (
     <div className={getLayoutClasses()}>
-      <Navigation />
       <main className={`pt-16 pb-8 ${getAnimationClasses()}`}>
         {children}
       </main>
