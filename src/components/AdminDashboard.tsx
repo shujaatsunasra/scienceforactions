@@ -626,8 +626,7 @@ export default function AdminDashboard() {
             )}
           </div>
         );
-          </div>
-        );
+         
 
       case 'evolution':
         return (
